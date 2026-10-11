@@ -1,0 +1,5 @@
+const CACHE='ruta-interior-woendi-m3-v1';
+const CORE=['./','./index.html','./styles.css','./app.js','./manifest.webmanifest','./resultados.html','./assets/icon.svg','./assets/mascota-luz.webp','./assets/infografia-autoconocimiento.webp','./assets/infografia-desarrollo.webp','./assets/infografia-meta.webp','./audio/ficha1.mp3','./audio/ficha2.mp3','./audio/ficha3.mp3'];
+self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting())));
+self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
+self.addEventListener('fetch',event=>{const req=event.request;if(req.method!=='GET'||new URL(req.url).origin!==self.location.origin)return;event.respondWith(caches.match(req).then(cached=>cached||fetch(req).then(response=>{if(response.ok){const clone=response.clone();caches.open(CACHE).then(cache=>cache.put(req,clone));}return response;}).catch(()=>caches.match('./index.html'))));});
